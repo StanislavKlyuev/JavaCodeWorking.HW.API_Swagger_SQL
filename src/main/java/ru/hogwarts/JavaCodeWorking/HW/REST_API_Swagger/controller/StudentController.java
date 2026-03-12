@@ -18,35 +18,33 @@ public class StudentController {
         this.studentService = studentService;
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllStudents() {
-        Collection<Student> coll = studentService.getAllStudents();
-        if (coll.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student list is empty");
-        }
-        return  ResponseEntity.ok(coll);
+    @PostMapping
+    public Student createStudent(@RequestBody Student student) {
+        return studentService.createStudent(student);
+        //return ResponseEntity.ok().build();
+
     }
 
     @GetMapping("{id}")
-    public ResponseEntity<?> getStudent(@PathVariable Long id) {
-        Student newStudent = studentService.getStudent(id);
+    public ResponseEntity<?> getStudentById(@PathVariable Long id) {
+        Student newStudent = studentService.getStudentById(id);
         if (newStudent == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student was not found");
         }
         return ResponseEntity.ok(newStudent);
     }
 
-    @PostMapping
-    public ResponseEntity<?> createStudent(@RequestBody Student student) {
-        Student newStudent = studentService.createStudent(student);
-        if (newStudent == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Student was not created");
+    @GetMapping("/all")
+    public ResponseEntity<?> getAllStudents() {
+        Collection<Student> coll = studentService.getAllStudents();
+        if (coll.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student list is empty");
         }
-        return ResponseEntity.ok(newStudent);
+        return ResponseEntity.ok(coll);
     }
 
     @PutMapping("{id}")
-    public ResponseEntity<?>  updateStudent(@RequestBody Student student, @PathVariable Long id) {
+    public ResponseEntity<?> updateStudent(@RequestBody Student student, @PathVariable Long id) {
         Student newStudent = studentService.updateStudent(student, id);
         if (newStudent == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Student was not update");
@@ -56,15 +54,11 @@ public class StudentController {
 
     @DeleteMapping("{id}")
     public ResponseEntity<?> deleteStudent(@PathVariable Long id) {
-        Student student = studentService.deleteStudent(id);
-        if (student == null) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student was not found");
-        }
-        return ResponseEntity.ok(student);
+        return studentService.deleteStudentById(id);
     }
 
     @GetMapping
-    public ResponseEntity<?> getStudentsByAge(@RequestParam("age")  int age) {
+    public ResponseEntity<?> getStudentsByAge(@RequestParam("age") int age) {
         Collection<Student> coll = studentService.getStudentByAge(age);
         if (coll.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student with age " + age + " was not found");
