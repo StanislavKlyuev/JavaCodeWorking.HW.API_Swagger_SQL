@@ -1,52 +1,56 @@
 package ru.hogwarts.JavaCodeWorking.HW.REST_API_Swagger.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.JavaCodeWorking.HW.REST_API_Swagger.model.Student;
+import ru.hogwarts.JavaCodeWorking.HW.REST_API_Swagger.repository.StudentRepository;
 
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 @Service
 public class StudentService {
 
-    private final Map<Long, Student> students = new HashMap<>();
-    private Long id = 0L;
+    @Autowired
+    private final StudentRepository studentRepository;
+
+    public StudentService(StudentRepository studentRepository) {
+        this.studentRepository = studentRepository;
+    }
 
     public Student createStudent(Student student) {
-        if (student.getName() == null || student.getName().isBlank() || student.getAge() == 0) {
-            return null;
-        }
-        student.setId(++id);
-        students.put(student.getId(), student);
-        return student;
+        return studentRepository.save(student);
+    }
+
+    public Student getStudentById(Long id) {
+        return studentRepository.findById(id).get();
     }
 
     public Collection<Student> getAllStudents() {
-        return students.values();
-    }
-
-    public Student getStudent(Long id) {
-        return students.get(id);
+        return studentRepository.findAll();
     }
 
     public Student updateStudent(Student student, Long id) {
-        if (!students.containsKey(id) || student.getName() == null || student.getName().isBlank() || student.getAge() == 0) {
+        if (!studentRepository.existsById(id)) {
             return null;
         }
         student.setId(id);
-        return students.put(id, student);
+        return studentRepository.save(student);
     }
 
-    public Student deleteStudent(Long id) {
-        return students.remove(id);
+    public ResponseEntity<?> deleteStudentById(Long id) {
+        if (studentRepository.existsById(id)) {
+            studentRepository.deleteById(id);
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Student with id " + id + " was not found");
     }
 
     public Collection<Student> getStudentByAge(int age) {
-        return students.values()
+        return studentRepository.findAll()
                 .stream()
                 .filter(s -> s.getAge() == age)
                 .toList();
-
     }
 }
