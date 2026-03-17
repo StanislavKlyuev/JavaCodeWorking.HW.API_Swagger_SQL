@@ -24,6 +24,9 @@ public class StudentService {
     }
 
     public Student getStudentById(Long id) {
+        if(!studentRepository.existsById(id)) {
+            return null;
+        }
         return studentRepository.findById(id).get();
     }
 

@@ -28,6 +28,9 @@ public class FacultyService {
     }
 
     public Faculty getFacultyById(Long id) {
+        if (!facultyRepository.existsById(id)) {
+            return null;
+        }
         return facultyRepository.findById(id).get();
     }
 
@@ -60,10 +63,10 @@ public class FacultyService {
     }
 
     public Faculty findFacultyByStudentId(long studentId) {
-        Optional<Student> opt = studentService.getAllStudents().stream().filter(s -> s.getId() == studentId).findAny();
-        if (opt.isEmpty()) {
+        Optional<Student> optional = Optional.of(studentService.getStudentById(studentId));
+        if (optional.isEmpty()) {
             return null;
         }
-        return opt.get().getFaculty();
+        return optional.get().getFaculty();
     }
 }
