@@ -5,9 +5,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import ru.hogwarts.JavaCodeWorking.HW.REST_API_Swagger.model.Faculty;
+import ru.hogwarts.JavaCodeWorking.HW.REST_API_Swagger.model.Student;
 import ru.hogwarts.JavaCodeWorking.HW.REST_API_Swagger.repository.FacultyRepository;
 
 import java.util.Collection;
+import java.util.Optional;
 
 @Service
 public class FacultyService {
@@ -57,8 +59,11 @@ public class FacultyService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Faculty with id " + id + " was not found");
     }
 
-    public Faculty findFac(long id) {
-
-        return studentService.getStudentById(id).getFaculty();
+    public Faculty findFacultyByStudentId(long studentId) {
+        Optional<Student> opt = studentService.getAllStudents().stream().filter(s -> s.getId() == studentId).findAny();
+        if (opt.isEmpty()) {
+            return null;
+        }
+        return opt.get().getFaculty();
     }
 }
