@@ -19,7 +19,7 @@ public class FacultyController {
     }
 
     @PostMapping
-    public ResponseEntity<?> createFaculty(@RequestBody Faculty faculty) {
+    public ResponseEntity createFaculty(@RequestBody Faculty faculty) {
         Faculty newFaculty = facultyService.createFaculty(faculty);
         if (newFaculty == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Faculty was not created");
@@ -27,38 +27,37 @@ public class FacultyController {
         return ResponseEntity.ok(newFaculty);
     }
 
-    @GetMapping("/all")
-    public ResponseEntity<?> getAllFaculties() {
-        Collection<Faculty> coll = facultyService.getAllFaculties();
-        if (coll.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Faculty list is empty");
+    @GetMapping()
+    public ResponseEntity getFaculties(@RequestParam(required = false) String name,
+                                       @RequestParam(required = false) String color) {
+        if (name != null && !name.isBlank()) {
+            Collection<?> coll = facultyService.getFacultiesByName(name);
+            if (coll.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Faculty with name \"" + name + "\" was not found");
+            }
+            return ResponseEntity.ok(coll);
         }
-        return ResponseEntity.ok(coll);
+        if (color != null && !color.isBlank()) {
+            Collection<?> coll = facultyService.getFacultiesByColor(color);
+            if (coll.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Faculty with color \"" + color + "\" was not found");
+            }
+            return ResponseEntity.ok(coll);
+        }
+        return ResponseEntity.ok(facultyService.getAllFaculties());
     }
 
     @GetMapping("{id}")
     public ResponseEntity<?> getFacultyById(@PathVariable Long id) {
-        Faculty faculty = facultyService.getFaculty(id);
+        Faculty faculty = facultyService.getFacultyById(id);
         if (faculty == null) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Faculty with id " + id + " was not found");
         }
         return ResponseEntity.ok(faculty);
     }
 
-    @GetMapping
-    public ResponseEntity<?> getFacultiesByColor(@RequestParam("color") String color) {
-        Collection<Faculty> coll = facultyService.getFacultiesByColor(color);
-        if (coll == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("There is no such color");
-        }
-        if (coll.isEmpty()) {
-            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Faculty was not found");
-        }
-        return ResponseEntity.ok(coll);
-    }
-
     @PutMapping("{id}")
-    public ResponseEntity<?> updateFaculty(@RequestBody Faculty faculty, @PathVariable Long id) {
+    public ResponseEntity updateFaculty(@RequestBody Faculty faculty, @PathVariable Long id) {
         Faculty newFaculty = facultyService.updateFaculty(id, faculty);
         if (newFaculty == null) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Faculty was not updated");
@@ -67,7 +66,16 @@ public class FacultyController {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity<?> deleteFacultyByID(@PathVariable Long id) {
+    public ResponseEntity deleteFacultyByID(@PathVariable Long id) {
         return facultyService.deleteFacultyById(id);
+    }
+
+    @GetMapping("/student_id/{id}")
+    public ResponseEntity<?> getFacultyByStudentID(@PathVariable("id") Long student_id) {
+        Faculty faculty = facultyService.findFacultyByStudentId(student_id);
+        if (faculty == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Faculty by student_id #\"" + student_id + "\" was not found........ЗДЕСЬ НЕТ ТАКОГО СТУДЕНТА!");
+        }
+        return ResponseEntity.ok(faculty);
     }
 }
