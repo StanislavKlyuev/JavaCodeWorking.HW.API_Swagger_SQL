@@ -14,6 +14,8 @@ public class FacultyService {
 
     @Autowired
     private final FacultyRepository facultyRepository;
+    @Autowired
+    private StudentService studentService;
 
     public FacultyService(FacultyRepository facultyRepository) {
         this.facultyRepository = facultyRepository;
@@ -23,12 +25,20 @@ public class FacultyService {
         return facultyRepository.save(faculty);
     }
 
-    public Faculty getFaculty(Long id) {
+    public Faculty getFacultyById(Long id) {
         return facultyRepository.findById(id).get();
     }
 
     public Collection<Faculty> getAllFaculties() {
         return facultyRepository.findAll();
+    }
+
+    public Collection<Faculty> getFacultiesByName(String name) {
+        return facultyRepository.findByNameContainsIgnoreCase(name);
+    }
+
+    public Collection<Faculty> getFacultiesByColor(String color) {
+        return facultyRepository.findByColorContainsIgnoreCase(color);
     }
 
     public Faculty updateFaculty(long id, Faculty faculty) {
@@ -47,13 +57,8 @@ public class FacultyService {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Faculty with id " + id + " was not found");
     }
 
-    public Collection<Faculty> getFacultiesByColor(String color) {
-        if (color == null || color.isBlank()) {
-            return null;
-        }
-        return facultyRepository.findAll()
-                .stream()
-                .filter(f -> f.getColor().equals(color))
-                .toList();
+    public Faculty findFac(long id) {
+
+        return studentService.getStudentById(id).getFaculty();
     }
 }

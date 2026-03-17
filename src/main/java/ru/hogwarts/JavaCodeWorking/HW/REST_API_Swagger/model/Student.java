@@ -1,8 +1,7 @@
 package ru.hogwarts.JavaCodeWorking.HW.REST_API_Swagger.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 
 import java.util.Objects;
 
@@ -13,8 +12,14 @@ public class Student {
     @GeneratedValue
     private Long id;
 
-    private String name;
     private int age;
+    private String name;
+    private String surname;
+
+    @ManyToOne
+    @JoinColumn(name = "faculty_id")
+    @JsonIgnore
+    private Faculty faculty;
 
     public Long getId() {
         return id;
@@ -32,6 +37,14 @@ public class Student {
         this.name = name;
     }
 
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String name) {
+        this.surname = surname;
+    }
+
     public int getAge() {
         return age;
     }
@@ -45,6 +58,7 @@ public class Student {
         return "Student{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
+                ", surname='" + surname + '\'' +
                 ", age=" + age +
                 '}';
     }
@@ -54,11 +68,16 @@ public class Student {
         if (o == null || getClass() != o.getClass()) return false;
         if (this == o) return true;
         Student student = (Student) o;
-        return age == student.age && Objects.equals(id, student.id) && Objects.equals(name, student.name);
+        return Objects.equals(id, student.id) && Objects.equals(name, student.name) && Objects.equals(surname, student.surname) && age == student.age;
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, name, age);
+        return Objects.hash(id, name, surname, age);
+    }
+
+
+    public Faculty getFaculty() {
+        return faculty;
     }
 }
