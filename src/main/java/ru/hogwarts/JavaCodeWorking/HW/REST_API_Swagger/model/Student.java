@@ -12,14 +12,24 @@ public class Student {
     @GeneratedValue
     private Long id;
 
-    private int age;
     private String name;
     private String surname;
+    private int age;
 
     @ManyToOne
     @JoinColumn(name = "faculty_id")
     @JsonIgnore
     private Faculty faculty;
+
+    public Student() {
+
+    }
+
+    public Student(Long id, String name, String surname, int age) {
+        this.name = name;
+        this.surname = surname;
+        this.age = age;
+    }
 
     public Long getId() {
         return id;
@@ -75,7 +85,6 @@ public class Student {
     public int hashCode() {
         return Objects.hash(id, name, surname, age);
     }
-
 
     public Faculty getFaculty() {
         return faculty;
